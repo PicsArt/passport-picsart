@@ -1,0 +1,46 @@
+{
+    "name": "passport-picsart",
+    "version": "1.0.1",
+    "description": "PicsArt authentication strategy for Passport.",
+    "keywords": [
+        "passport",
+        "picsart",
+        "auth",
+        "oauth",
+        "authentication",
+        "identity"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/jaredhanson/passport-twitter.git"
+    },
+    "bugs": {
+        "url": "https://github.com/PicsArt/passport-picsart/issues"
+    },
+    "author": {
+        "name": "Alex Movsisyan",
+        "email": "alex@picsart.com",
+        "url": "http://dev.picsart.com/"
+    },
+    "licenses": [
+        {
+            "type": "MIT",
+            "url": "http://www.opensource.org/licenses/MIT"
+        }
+    ],
+    "main": "./lib",
+    "dependencies": {
+        "passport-oauth1": "1.x.x",
+        "xtraverse": "0.1.x"
+    },
+    "devDependencies": {
+        "mocha": "1.x.x",
+        "chai": "1.x.x",
+        "chai-passport-strategy": "0.1.x"
+    },
+    "engines": {
+        "node": ">= 0.4.0"
+    },
+    "readmeFilename": "README.md",
+    "homepage": "https://github.com/PicsArt/passport-picsart"
+}
