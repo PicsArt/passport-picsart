@@ -1,10 +1,13 @@
 var express = require('express')
-        , passport = require('passport')
-        , util = require('util')
-        , PicsArtStrategy = require('passport-picsart').Strategy;
+  , passport = require('passport')
+  , PicsartStrategy = require('passport-picsart').Strategy
+  , session = require('express-session')
+  , bodyParser = require("body-parser")
+  , cookieParser = require("cookie-parser")
+  , methodOverride = require('method-override');
 
-var TWITTER_CONSUMER_KEY = "--insert-twitter-consumer-key-here--";
-var TWITTER_CONSUMER_SECRET = "--insert-twitter-consumer-secret-here--";
+var PICSART_APP_ID = "brand3podc38H5MGR2zif9";
+var PICSART_APP_SECRET = "bX8bfUXLP8ejxg1BABkBAENfwWX0wTnR";
 
 
 // Passport session setup.
@@ -12,102 +15,102 @@ var TWITTER_CONSUMER_SECRET = "--insert-twitter-consumer-secret-here--";
 //   serialize users into and deserialize users out of the session.  Typically,
 //   this will be as simple as storing the user ID when serializing, and finding
 //   the user by ID when deserializing.  However, since this example does not
-//   have a database of user records, the complete Twitter profile is serialized
+//   have a database of user records, the complete PicsArt profile is serialized
 //   and deserialized.
-passport.serializeUser(function (user, done) {
-    done(null, user);
+passport.serializeUser(function(user, done) {
+  done(null, user);
 });
 
-passport.deserializeUser(function (obj, done) {
-    done(null, obj);
+passport.deserializeUser(function(obj, done) {
+  done(null, obj);
 });
 
 
-// Use the PicsArtStrategy within Passport.
-//   Strategies in passport require a `verify` function, which accept
-//   credentials (in this case, a token, tokenSecret, and Twitter profile), and
-//   invoke a callback with a user object.
-passport.use(new PicsArtStrategy({
-            consumerKey: TWITTER_CONSUMER_KEY,
-            consumerSecret: TWITTER_CONSUMER_SECRET,
-            callbackURL: "http://127.0.0.1:3100/auth/twitter/callback",
-            requestTokenURL: 'http://api.picsart.app:3000/oauth/request_token'
-        },
-        function (token, tokenSecret, profile, done) {
-            // asynchronous verification, for effect...
-            process.nextTick(function () {
-
-                // To keep the example simple, the user's Twitter profile is returned to
-                // represent the logged-in user.  In a typical application, you would want
-                // to associate the Twitter account with a user record in your database,
-                // and return that user instead.
-                return done(null, profile);
-            });
-        }
+// Use the PicsartStrategy within Passport.
+//   Strategies in Passport require a `verify` function, which accept
+//   credentials (in this case, an accessToken and PicsArt
+//   profile), and invoke a callback with a user object.
+passport.use(new PicsartStrategy({
+    clientID: PICSART_APP_ID,
+    clientSecret: PICSART_APP_SECRET,
+    callbackURL: "http://localhost:8808/auth/picsart/callback",
+		authorizationURL: "http://picsart.app:3000/api/oauth2/authorize",
+		tokenURL: "http://picsart.app:3000/api/oauth2/token",
+		profileURL: "http://picsart.app:3000/api/users/show/me.json"
+  },
+  function(accessToken, refreshToken, profile, done) {
+    // asynchronous verification, for effect...
+    process.nextTick(function () {
+      
+      // To keep the example simple, the user's PicsArt profile is returned to
+      // represent the logged-in user.  In a typical application, you would want
+      // to associate the PicsArt account with a user record in your database,
+      // and return that user instead.
+      return done(null, profile);
+    });
+  }
 ));
+
+
 
 
 var app = express();
 
 // configure Express
-app.set('views', __dirname + '/views');
-app.set('view engine', 'ejs');
-//app.use(express.logger());
-app.use(require('cookie-parser')()) // required before session.
-app.use(require('body-parser').urlencoded({
-    extended: true
-})); 						// pull information from html in POST
-app.use(require('body-parser').json()); 						// pull information from html in POST
-app.use(require('method-override')()); 					// simulate DELETE and PUT
-app.use(require('express-session')({ secret: 'keyboard cat' }));
-// Initialize Passport!  Also use passport.session() middleware, to support
-// persistent login sessions (recommended).
-app.use(passport.initialize());
-app.use(passport.session());
-//app.use(app.router);
-app.use(express.static(__dirname + '/public'));
+  app.set('views', __dirname + '/views');
+  app.set('view engine', 'ejs');
+  app.use(cookieParser());
+  app.use(bodyParser());
+  app.use(methodOverride());
+  app.use(session({ secret: 'keyboard cat' }));
+  // Initialize Passport!  Also use passport.session() middleware, to support
+  // persistent login sessions (recommended).
+  app.use(passport.initialize());
+  app.use(passport.session());
+  app.use(express.static(__dirname + '/public'));
 
-app.get('/', function (req, res) {
-    res.render('index', { user: req.user });
+
+app.get('/', function(req, res){
+  res.render('index', { user: req.user });
 });
 
-app.get('/account', ensureAuthenticated, function (req, res) {
-    res.render('account', { user: req.user });
+app.get('/account', ensureAuthenticated, function(req, res){
+  res.render('account', { user: req.user });
 });
 
-app.get('/login', function (req, res) {
-    res.render('login', { user: req.user });
+app.get('/login', function(req, res){
+  res.render('login', { user: req.user });
 });
 
-// GET /auth/twitter
+// GET /auth/picsart
 //   Use passport.authenticate() as route middleware to authenticate the
-//   request.  The first step in Twitter authentication will involve redirecting
-//   the user to twitter.com.  After authorization, the Twitter will redirect
-//   the user back to this application at /auth/twitter/callback
-app.get('/auth/twitter',
-        passport.authenticate('twitter'),
-        function (req, res) {
-            // The request will be redirected to Twitter for authentication, so this
-            // function will not be called.
-        });
+//   request.  The first step in PicsArt authentication will involve
+//   redirecting the user to picsart.com.  After authorization, PicsArt will
+//   redirect the user back to this application at /auth/picsart/callback
+app.get('/auth/picsart',
+  passport.authenticate('picsart'),
+  function(req, res){
+    // The request will be redirected to PicsArt for authentication, so this
+    // function will not be called.
+  });
 
-// GET /auth/twitter/callback
+// GET /auth/picsart/callback
 //   Use passport.authenticate() as route middleware to authenticate the
 //   request.  If authentication fails, the user will be redirected back to the
-//   login page.  Otherwise, the primary route function function will be called,
+//   login page.  Otherwise, the primary route function will be called,
 //   which, in this example, will redirect the user to the home page.
-app.get('/auth/twitter/callback',
-        passport.authenticate('twitter', { failureRedirect: '/login' }),
-        function (req, res) {
-            res.redirect('/');
-        });
-
-app.get('/logout', function (req, res) {
-    req.logout();
+app.get('/auth/picsart/callback', 
+  passport.authenticate('picsart', { failureRedirect: '/login' }),
+  function(req, res) {
     res.redirect('/');
+  });
+
+app.get('/logout', function(req, res){
+  req.logout();
+  res.redirect('/');
 });
 
-app.listen(3100);
+app.listen(8808);
 
 
 // Simple route middleware to ensure user is authenticated.
@@ -116,8 +119,6 @@ app.listen(3100);
 //   the request will proceed.  Otherwise, the user will be redirected to the
 //   login page.
 function ensureAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
-        return next();
-    }
-    res.redirect('/login')
+  if (req.isAuthenticated()) { return next(); }
+  res.redirect('/login')
 }

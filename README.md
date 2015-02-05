@@ -21,24 +21,24 @@ unobtrusively integrated into any application or framework that supports
 
 #### Configure Strategy
 
-The Twitter authentication strategy authenticates users using a Twitter account
-and OAuth tokens.  The strategy requires a `verify` callback, which receives the
+The PicsArt authentication strategy authenticates users using a PicsArt account
+and OAuth 2.0 tokens.  The strategy requires a `verify` callback, which receives the
 access token and corresponding secret as arguments, as well as `profile` which
-contains the authenticated user's Twitter profile.   The `verify` callback must
+contains the authenticated user's PicsArt profile.   The `verify` callback must
 call `done` providing a user to complete authentication.
 
-In order to identify your application to Twitter, specify the consumer key,
-consumer secret, and callback URL within `options`.  The consumer key and secret
-are obtained by [creating an application](https://dev.twitter.com/apps) at
-Twitter's [developer](https://dev.twitter.com/) site.
+In order to identify your application to PicsArt, specify the client ID,
+client secret, and callback URL within `options`.  The client ID and secret
+are obtained by [creating an application](https://dev.picsart.com/apps) at
+PicsArt's [developer](https://dev.picsart.com/) site.
 
-    passport.use(new TwitterStrategy({
-        consumerKey: TWITTER_CONSUMER_KEY,
-        consumerSecret: TWITTER_CONSUMER_SECRET,
-        callbackURL: "http://127.0.0.1:3000/auth/twitter/callback"
+    passport.use(new PicsartStrategy({
+        clientId: PICSART_CLIENT_ID,
+        clientSecret: PICSART_CLIENT_SECRET,
+        callbackURL: "http://127.0.0.1:3000/auth/picsart/callback"
       },
-      function(token, tokenSecret, profile, done) {
-        User.findOrCreate({ twitterId: profile.id }, function (err, user) {
+      function(accessToken, profile, done) {
+        User.findOrCreate({ picsartId: profile.id }, function (err, user) {
           return done(err, user);
         });
       }
@@ -46,28 +46,24 @@ Twitter's [developer](https://dev.twitter.com/) site.
 
 #### Authenticate Requests
 
-Use `passport.authenticate()`, specifying the `'twitter'` strategy, to
+Use `passport.authenticate()`, specifying the `'picsart'` strategy, to
 authenticate requests.
 
 For example, as route middleware in an [Express](http://expressjs.com/)
 application:
 
-    app.get('/auth/twitter',
-      passport.authenticate('twitter'));
+    app.get('/auth/picsart',
+      passport.authenticate('picsart'));
     
-    app.get('/auth/twitter/callback', 
-      passport.authenticate('twitter', { failureRedirect: '/login' }),
+    app.get('/auth/picsart/callback', 
+      passport.authenticate('picsart', { failureRedirect: '/login' }),
       function(req, res) {
         // Successful authentication, redirect home.
         res.redirect('/');
       });
 
-## Examples
-
-For a complete, working example, refer to the [signin example](https://github.com/PicsArt/passport-picsart/tree/master/examples/signin).
-
 ## License
 
 [The MIT License](http://opensource.org/licenses/MIT)
 
-Copyright (c) 2014 PicsArt <[http://www.picsart.com/](http://www.picsart.com/)>
+Copyright (c) 2015 PicsArt <[http://www.picsart.com/](http://www.picsart.com/)>
