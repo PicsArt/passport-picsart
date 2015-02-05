@@ -6,8 +6,8 @@ var express = require('express')
   , cookieParser = require("cookie-parser")
   , methodOverride = require('method-override');
 
-var PICSART_APP_ID = "brand3podc38H5MGR2zif9";
-var PICSART_APP_SECRET = "bX8bfUXLP8ejxg1BABkBAENfwWX0wTnR";
+var PICSART_APP_ID = "--picsart-app-id-here--";
+var PICSART_APP_SECRET = "--picsart-app-secret-here--";
 
 
 // Passport session setup.
@@ -34,9 +34,6 @@ passport.use(new PicsartStrategy({
     clientID: PICSART_APP_ID,
     clientSecret: PICSART_APP_SECRET,
     callbackURL: "http://localhost:8808/auth/picsart/callback",
-		authorizationURL: "http://picsart.app:3000/api/oauth2/authorize",
-		tokenURL: "http://picsart.app:3000/api/oauth2/token",
-		profileURL: "http://picsart.app:3000/api/users/show/me.json"
   },
   function(accessToken, refreshToken, profile, done) {
     // asynchronous verification, for effect...
